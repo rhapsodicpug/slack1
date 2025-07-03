@@ -1,0 +1,33 @@
+{
+    "name": "Slack Summary Bot",
+    "description": "gives summary of your recents chats in one click",
+    "schema": {
+        "type": "function",
+        "function": {
+            "name": "Slack Summary Bot",
+            "description": "gives summary of your recents chats in one click",
+            "strict": true,
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "EXAMPLE_PARAM_ONE": {
+                        "type": "string",
+                        "description": "EXAMPLE_PARAM_ONE_DESCRIPTION"
+                    },
+                    "EXAMPLE_PARAM_TWO": {
+                        "type": "string",
+                        "description": "EXAMPLE_PARAM_TWO_DESCRIPTION"
+                    }
+                },
+                "required": [
+                    "EXAMPLE_PARAM_ONE",
+                    "EXAMPLE_PARAM_TWO"
+                ],
+                "additionalProperties": false
+            }
+        }
+    },
+    "envVars": [
+        "ENV_VAR_ONE"
+    ]
+}
