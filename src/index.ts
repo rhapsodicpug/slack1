@@ -13,12 +13,10 @@ export async function handler(event: any): Promise<any> {
       text: body.args.text || undefined
     };
     
-    await summarizeSlackChat(payload);
+    // Call the function and return its result directly
+    const result = await summarizeSlackChat(payload);
+    return result;
 
-    return {
-      statusCode: 200,
-      body: JSON.stringify({ message: 'Tool execution initiated successfully.' }),
-    };
   } catch (error: unknown) { // Explicitly type 'error' as 'unknown'
     console.error('Error in handler:', error);
 
@@ -31,7 +29,6 @@ export async function handler(event: any): Promise<any> {
         // Check if it's an object with a 'message' property
         errorMessage = (error as { message: string }).message;
     }
-
 
     return {
       statusCode: 500,
