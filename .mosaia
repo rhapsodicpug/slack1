@@ -10,24 +10,29 @@
             "parameters": {
                 "type": "object",
                 "properties": {
-                    "EXAMPLE_PARAM_ONE": {
+                    "channel_id": {
                         "type": "string",
-                        "description": "EXAMPLE_PARAM_ONE_DESCRIPTION"
+                        "description": "The Slack channel ID to summarize"
                     },
-                    "EXAMPLE_PARAM_TWO": {
+                    "user_id": {
                         "type": "string",
-                        "description": "EXAMPLE_PARAM_TWO_DESCRIPTION"
+                        "description": "The Slack user ID requesting the summary"
+                    },
+                    "text": {
+                        "type": "string",
+                        "description": "Optional text to include with the summary request"
                     }
                 },
                 "required": [
-                    "EXAMPLE_PARAM_ONE",
-                    "EXAMPLE_PARAM_TWO"
+                    "channel_id",
+                    "user_id"
                 ],
                 "additionalProperties": false
             }
         }
     },
     "envVars": [
-        "ENV_VAR_ONE"
+        "ENV_VAR_ONE",
+        "ENV_VAR_TWO"
     ]
 }
