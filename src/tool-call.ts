@@ -11,7 +11,7 @@ import { WebClient } from '@slack/web-api';
  * @param {string} [payload.text] - Optional text provided with the command (e.g., number of messages to fetch).
  * @returns {Promise<any>}
  */
-export async function summarizeSlackChat(payload: { channel_id: string; user_id: string; text?: string }): Promise<any> {
+export async function summarizeSlackChat(payload: { channel_id: string; user_id: string; text: string }): Promise<any> {
   console.log('=== TOOL CALL STARTED ===');
   console.log('Payload received:', JSON.stringify(payload, null, 2));
   
@@ -50,7 +50,7 @@ export async function summarizeSlackChat(payload: { channel_id: string; user_id:
 
   // Determine how many messages to fetch (default to 50, or parse from user input)
   let limit = 50;
-  if (text) {
+  if (text && text.trim() !== '') {
     const parsedLimit = parseInt(text, 10);
     if (!isNaN(parsedLimit) && parsedLimit > 0 && parsedLimit <= 200) {
       limit = parsedLimit;
@@ -87,8 +87,8 @@ export async function summarizeSlackChat(payload: { channel_id: string; user_id:
 
     // Format messages for Slack display
     const formattedMessages = history.messages.map(msg => {
-      const userName = msg.user ? `<@${msg.user}>` : 'Unknown User';
-      const messageText = msg.text || '';
+        const userName = msg.user ? `<@${msg.user}>` : 'Unknown User';
+        const messageText = msg.text || '';
       const timestamp = msg.ts ? new Date(parseFloat(msg.ts) * 1000).toLocaleString() : '';
       
       return `*${userName}* [${timestamp}]: ${messageText}`;
@@ -101,7 +101,7 @@ export async function summarizeSlackChat(payload: { channel_id: string; user_id:
 
     // Post the chat history back to the Slack channel
     const postResult = await web.chat.postMessage({
-      channel: channel_id,
+            channel: channel_id,
       text: messageText,
       unfurl_links: false,
       unfurl_media: false
