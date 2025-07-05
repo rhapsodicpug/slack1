@@ -34,5 +34,11 @@
     "envVars": [
         "ENV_VAR_ONE",
         "ENV_VAR_TWO"
-    ]
+    ],
+    "server": {
+        "startCommand": "npm run start:dev",
+        "port": 3000,
+        "endpoint": "/",
+        "method": "GET"
+    }
 }
