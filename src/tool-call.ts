@@ -2,7 +2,7 @@ import { WebClient } from '@slack/web-api';
 
 /**
  * This function handles the Mosaia tool call for fetching Slack chat history.
- * It fetches recent messages and returns them directly without any processing.
+ * It fetches recent messages and posts them back to the Slack channel.
  *
  * @param {object} payload - The payload received from the Mosaia agent,
  * containing context like channel ID and user ID.
@@ -42,6 +42,11 @@ export async function summarizeSlackChat(payload: { channel_id: string; user_id:
     });
 
     if (!history.messages || history.messages.length === 0) {
+      await web.chat.postMessage({
+        channel: channel_id,
+        text: `No recent messages found in this channel.`
+      });
+      
       return {
         statusCode: 200,
         body: JSON.stringify({ 
@@ -51,32 +56,53 @@ export async function summarizeSlackChat(payload: { channel_id: string; user_id:
       };
     }
 
-    // Format messages for return (keep it simple)
-    const formattedMessages = history.messages.map(msg => ({
-      user: msg.user || 'Unknown User',
-      text: msg.text || '',
-      timestamp: msg.ts ? new Date(parseFloat(msg.ts) * 1000).toISOString() : '',
-      type: msg.subtype || 'message'
-    }));
+    // Format messages for Slack display
+    const formattedMessages = history.messages.map(msg => {
+      const userName = msg.user ? `<@${msg.user}>` : 'Unknown User';
+      const messageText = msg.text || '';
+      const timestamp = msg.ts ? new Date(parseFloat(msg.ts) * 1000).toLocaleString() : '';
+      
+      return `*${userName}* [${timestamp}]: ${messageText}`;
+    });
+
+    // Create the message to post back to Slack
+    const messageText = `*Chat History (${formattedMessages.length} messages):*\n\n${formattedMessages.join('\n\n')}`;
+
+    // Post the chat history back to the Slack channel
+    await web.chat.postMessage({
+      channel: channel_id,
+      text: messageText,
+      unfurl_links: false,
+      unfurl_media: false
+    });
 
     return {
       statusCode: 200,
       body: JSON.stringify({
-        message: `Successfully fetched ${formattedMessages.length} messages from channel.`,
+        message: `Successfully posted ${formattedMessages.length} messages back to Slack channel.`,
         channel_id: channel_id,
-        message_count: formattedMessages.length,
-        messages: formattedMessages
+        message_count: formattedMessages.length
       })
     };
 
   } catch (error) {
-    console.error('Error fetching Slack messages:', error);
+    console.error('Error fetching or posting Slack messages:', error);
     
-    let errorMessage = 'An unknown error occurred while fetching messages.';
+    let errorMessage = 'An unknown error occurred while processing messages.';
     if (error instanceof Error) {
       errorMessage = error.message;
     } else if (typeof error === 'string') {
       errorMessage = error;
+    }
+
+    // Try to post error message to Slack
+    try {
+      await web.chat.postMessage({
+        channel: channel_id,
+        text: `❌ Error: ${errorMessage}`
+      });
+    } catch (postError) {
+      console.error('Failed to post error message to Slack:', postError);
     }
 
     return {

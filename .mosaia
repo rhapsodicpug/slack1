@@ -1,18 +1,18 @@
 {
-    "name": "Slack Chat History Fetcher",
-    "description": "Fetches and returns recent chat history from a Slack channel",
+    "name": "Slack Chat History Poster",
+    "description": "Fetches recent chat history from a Slack channel and posts it back to the channel",
     "schema": {
         "type": "function",
         "function": {
-            "name": "Slack Chat History Fetcher",
-            "description": "Fetches and returns recent chat history from a Slack channel",
+            "name": "Slack Chat History Poster",
+            "description": "Fetches recent chat history from a Slack channel and posts it back to the channel",
             "strict": true,
             "parameters": {
                 "type": "object",
                 "properties": {
                     "channel_id": {
                         "type": "string",
-                        "description": "The Slack channel ID to fetch messages from"
+                        "description": "The Slack channel ID to fetch messages from and post history back to"
                     },
                     "user_id": {
                         "type": "string",
