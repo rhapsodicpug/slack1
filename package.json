@@ -8,7 +8,8 @@
     "build": "tsc",
     "start:dev": "npm run build && node bin/dev.js",
     "test:request": "curl -XGET \"http://localhost:3000?channel_id=C093FMQ93BR&user_id=U12345678\" && echo",
-    "validate:manifest": "node bin/validate-manifest.js"
+    "validate:manifest": "node bin/validate-manifest.js",
+    "get-user-id": "node get-user-id.js"
   },
   "devDependencies": {
     "@types/node": "^20.12.11",

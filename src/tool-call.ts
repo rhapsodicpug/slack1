@@ -1,6 +1,26 @@
 import { WebClient } from '@slack/web-api';
 
 /**
+ * Get the current user's ID using the Slack API
+ * @param slackToken - The Slack bot token
+ * @returns Promise with user ID and username
+ */
+export async function getCurrentUserInfo(slackToken: string): Promise<{ user_id: string; username: string }> {
+  const web = new WebClient(slackToken);
+  
+  try {
+    const authTest = await web.auth.test();
+    return {
+      user_id: authTest.user_id!,
+      username: authTest.user!
+    };
+  } catch (error) {
+    console.error('Error getting user info:', error);
+    throw new Error('Failed to get current user information from Slack');
+  }
+}
+
+/**
  * This function handles the Mosaia tool call for fetching Slack chat history.
  * It fetches recent messages and posts them back to the Slack channel.
  *
@@ -11,11 +31,11 @@ import { WebClient } from '@slack/web-api';
  * @param {string} [payload.text] - Optional text provided with the command (e.g., number of messages to fetch).
  * @returns {Promise<any>}
  */
-export async function summarizeSlackChat(payload: { channel_id: string; user_id: string; text: string }): Promise<any> {
+export async function summarizeSlackChat(payload: { channel_id: string; user_id: string; text: string; secrets: { SLACK_BOT_TOKEN: string } }): Promise<any> {
   console.log('=== TOOL CALL STARTED ===');
   console.log('Payload received:', JSON.stringify(payload, null, 2));
   
-  const { channel_id, user_id, text } = payload;
+  const { channel_id, user_id, text, secrets } = payload;
 
   // Validate required parameters
   if (!channel_id) {
@@ -34,15 +54,15 @@ export async function summarizeSlackChat(payload: { channel_id: string; user_id:
     };
   }
 
-  // Initialize Slack WebClient with your bot token
-  const slackToken = process.env.ENV_VAR_ONE;
+  // Initialize Slack WebClient with your bot token from secrets
+  const slackToken = secrets.SLACK_BOT_TOKEN;
   console.log('Slack token available:', !!slackToken);
   
   if (!slackToken) {
-    console.error('ENV_VAR_ONE (Slack token) is not set in environment variables.');
+    console.error('SLACK_BOT_TOKEN is not set in secrets.');
     return {
       statusCode: 500,
-      body: JSON.stringify({ error: 'Slack token not configured. Please set ENV_VAR_ONE in Mosaia dashboard.' })
+      body: JSON.stringify({ error: 'Slack token not configured. Please set SLACK_BOT_TOKEN in Mosaia dashboard.' })
     };
   }
   

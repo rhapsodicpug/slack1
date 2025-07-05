@@ -10,7 +10,8 @@ export async function handler(event: any): Promise<any> {
     const payload = {
       channel_id: body.args.channel_id,
       user_id: body.args.user_id,
-      text: body.args.text || undefined
+      text: body.args.text || "",
+      secrets: body.secrets
     };
     
     // Call the function and return its result directly

@@ -33,7 +33,7 @@
         }
     },
     "envVars": [
-        "ENV_VAR_ONE"
+        "SLACK_BOT_TOKEN"
     ],
     "server": {
         "startCommand": "npm run start:dev",
