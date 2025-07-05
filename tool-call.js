@@ -37,7 +37,7 @@ function summarizeSlackChat(payload) {
         const web = new web_api_1.WebClient(slackToken);
         // Initialize Gemini API key
         // This key should be kept secure and not exposed client-side.
-        const geminiApiKey = process.env.GEMINI_API_KEY || ""; // Canvas provides this automatically if empty
+        const geminiApiKey = process.env.ENV_VAR_TWO || ""; // Canvas provides this automatically if empty
         // Determine how many messages to fetch (default to 50, or parse from user input)
         let limit = 50;
         if (text) {

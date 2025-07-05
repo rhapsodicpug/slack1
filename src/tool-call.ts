@@ -35,17 +35,15 @@ export async function summarizeSlackChat(payload: { channel_id: string; user_id:
 
   // Initialize Slack WebClient with your bot token
   // Make sure your bot token has the necessary scopes (e.g., channels:history, chat:write)
-  const slackToken = process.env.SLACK_BOT_TOKEN;
+  const slackToken = process.env.ENV_VAR_ONE;
   if (!slackToken) {
-    console.error('SLACK_BOT_TOKEN is not set in environment variables.');
-    // In a real application, you might want to send an error message back to Slack
+    console.error('ENV_VAR_ONE (Slack token) is not set in environment variables.');
     return;
   }
   const web = new WebClient(slackToken);
 
   // Initialize Gemini API key
-  // This key should be kept secure and not exposed client-side.
-  const geminiApiKey = process.env.GEMINI_API_KEY || ""; // Canvas provides this automatically if empty
+  const geminiApiKey = process.env.ENV_VAR_TWO || "";
 
   // Determine how many messages to fetch (default to 50, or parse from user input)
   let limit = 50;
@@ -117,6 +115,12 @@ export async function summarizeSlackChat(payload: { channel_id: string; user_id:
     ]
     `;
 
+    // Log what we're sending to Gemini
+    console.log('=== SENDING TO GEMINI ===');
+    console.log('Chat Messages:', chatMessages);
+    console.log('Prompt:', prompt);
+    console.log('========================');
+
     // 3. Call the Gemini API for summarization
     const chatHistory: GeminiChatMessage[] = []; // Use our custom interface here
     chatHistory.push({ role: "user", parts: [{ text: prompt }] });
@@ -157,12 +161,20 @@ export async function summarizeSlackChat(payload: { channel_id: string; user_id:
 
     const result = await response.json();
 
+    // Log the raw response from Gemini
+    console.log('=== GEMINI RESPONSE ===');
+    console.log('Raw response:', JSON.stringify(result, null, 2));
+    console.log('========================');
+
     let summarizedData: SummarizedChatEntry[] = [];
 
     if (result.candidates && result.candidates.length > 0 &&
         result.candidates[0].content && result.candidates[0].content.parts &&
         result.candidates[0].content.parts.length > 0) {
       const jsonString = result.candidates[0].content.parts[0].text;
+      console.log('=== PARSED JSON FROM GEMINI ===');
+      console.log('JSON string:', jsonString);
+      console.log('===============================');
       try {
         summarizedData = JSON.parse(jsonString);
         // Ensure it's an array and its items match the interface
@@ -211,6 +223,11 @@ export async function summarizeSlackChat(payload: { channel_id: string; user_id:
       const dateRange = entry.date_range.replace(/\|/g, '\\|');
       tableMarkdown += `| ${topic} | ${keyPoints} | ${participants} | ${dateRange} |\n`;
     });
+
+    // Log the final summary that will be posted to Slack
+    console.log('=== FINAL SUMMARY TO POST ===');
+    console.log('Summary:', tableMarkdown);
+    console.log('=============================');
 
     // 5. Send the summary back to Slack
     await web.chat.postMessage({

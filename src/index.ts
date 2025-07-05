@@ -5,7 +5,15 @@ export async function handler(event: any): Promise<any> {
   console.log('Handler received event:', JSON.stringify(event, null, 2));
 
   try {
-    await summarizeSlackChat(event);
+    // Parse the event body to extract args
+    const body = JSON.parse(event.body);
+    const payload = {
+      channel_id: body.args.channel_id,
+      user_id: body.args.user_id,
+      text: body.args.text || undefined
+    };
+    
+    await summarizeSlackChat(payload);
 
     return {
       statusCode: 200,

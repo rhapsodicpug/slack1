@@ -14,13 +14,13 @@ if(ENV_VAR_ONE === undefined) {
 }
 
 app.get('/', async (req, res) => {
-    const { EXAMPLE_PARAM_ONE, EXAMPLE_PARAM_TWO } = req.query;
+    const { channel_id, user_id } = req.query;
 
     const event = {
         body: JSON.stringify({
             args: {
-                EXAMPLE_PARAM_ONE,
-                EXAMPLE_PARAM_TWO
+                channel_id,
+                user_id
             },
             secrets: {
                 ENV_VAR_ONE
