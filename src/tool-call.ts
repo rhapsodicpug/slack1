@@ -12,17 +12,40 @@ import { WebClient } from '@slack/web-api';
  * @returns {Promise<any>}
  */
 export async function summarizeSlackChat(payload: { channel_id: string; user_id: string; text?: string }): Promise<any> {
+  console.log('=== TOOL CALL STARTED ===');
+  console.log('Payload received:', JSON.stringify(payload, null, 2));
+  
   const { channel_id, user_id, text } = payload;
+
+  // Validate required parameters
+  if (!channel_id) {
+    console.error('Missing channel_id parameter');
+    return {
+      statusCode: 400,
+      body: JSON.stringify({ error: 'channel_id is required' })
+    };
+  }
+
+  if (!user_id) {
+    console.error('Missing user_id parameter');
+    return {
+      statusCode: 400,
+      body: JSON.stringify({ error: 'user_id is required' })
+    };
+  }
 
   // Initialize Slack WebClient with your bot token
   const slackToken = process.env.ENV_VAR_ONE;
+  console.log('Slack token available:', !!slackToken);
+  
   if (!slackToken) {
     console.error('ENV_VAR_ONE (Slack token) is not set in environment variables.');
     return {
       statusCode: 500,
-      body: JSON.stringify({ error: 'Slack token not configured' })
+      body: JSON.stringify({ error: 'Slack token not configured. Please set ENV_VAR_ONE in Mosaia dashboard.' })
     };
   }
+  
   const web = new WebClient(slackToken);
 
   // Determine how many messages to fetch (default to 50, or parse from user input)
@@ -34,6 +57,8 @@ export async function summarizeSlackChat(payload: { channel_id: string; user_id:
     }
   }
 
+  console.log(`Fetching ${limit} messages from channel: ${channel_id}`);
+
   try {
     // Fetch recent messages from the Slack channel
     const history = await web.conversations.history({
@@ -41,7 +66,11 @@ export async function summarizeSlackChat(payload: { channel_id: string; user_id:
       limit: limit,
     });
 
+    console.log(`Fetched ${history.messages?.length || 0} messages from Slack`);
+
     if (!history.messages || history.messages.length === 0) {
+      console.log('No messages found, posting empty message to Slack');
+      
       await web.chat.postMessage({
         channel: channel_id,
         text: `No recent messages found in this channel.`
@@ -68,20 +97,25 @@ export async function summarizeSlackChat(payload: { channel_id: string; user_id:
     // Create the message to post back to Slack
     const messageText = `*Chat History (${formattedMessages.length} messages):*\n\n${formattedMessages.join('\n\n')}`;
 
+    console.log('Posting message back to Slack...');
+
     // Post the chat history back to the Slack channel
-    await web.chat.postMessage({
+    const postResult = await web.chat.postMessage({
       channel: channel_id,
       text: messageText,
       unfurl_links: false,
       unfurl_media: false
     });
 
+    console.log('Message posted successfully:', postResult.ok);
+
     return {
       statusCode: 200,
       body: JSON.stringify({
         message: `Successfully posted ${formattedMessages.length} messages back to Slack channel.`,
         channel_id: channel_id,
-        message_count: formattedMessages.length
+        message_count: formattedMessages.length,
+        slack_response: postResult.ok
       })
     };
 
@@ -107,7 +141,10 @@ export async function summarizeSlackChat(payload: { channel_id: string; user_id:
 
     return {
       statusCode: 500,
-      body: JSON.stringify({ error: errorMessage })
+      body: JSON.stringify({ 
+        error: errorMessage,
+        details: error instanceof Error ? error.stack : 'No stack trace available'
+      })
     };
   }
 }
