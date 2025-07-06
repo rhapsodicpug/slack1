@@ -11,7 +11,10 @@ export async function handler(event: any): Promise<any> {
       channel_id: body.args.channel_id,
       user_id: body.args.user_id,
       text: body.args.text || "",
-      secrets: body.secrets
+      secrets: {
+        SLACK_BOT_TOKEN: body.secrets.SLACK_BOT_TOKEN,
+        GEMINI_API_KEY: body.secrets.GEMINI_API_KEY
+      }
     };
     
     // Call the function and return its result directly

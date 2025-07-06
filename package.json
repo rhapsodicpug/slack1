@@ -8,12 +8,16 @@
     "build": "tsc",
     "start:dev": "npm run build && node bin/dev.js",
     "test:request": "curl -XGET \"http://localhost:3000?channel_id=C093FMQ93BR&user_id=U12345678\" && echo",
+    "test:enhanced": "node test-enhanced.js",
+    "test:gemini": "node test-gemini-integration.js",
+    "test:gemini-simple": "node test-gemini-simple.js",
     "validate:manifest": "node bin/validate-manifest.js",
     "get-user-id": "node get-user-id.js"
   },
   "devDependencies": {
     "@types/node": "^20.12.11",
     "ajv": "^8.12.0",
+    "axios": "^1.6.0",
     "dotenv": "^16.6.1",
     "express": "^5.1.0",
     "ts-node": "^10.9.2",
@@ -21,7 +25,8 @@
   },
   "license": "ISC",
   "dependencies": {
-    "@slack/web-api": "^7.9.3"
+    "@slack/web-api": "^7.9.3",
+    "@google/generative-ai": "^0.21.0"
   },
   "bin": {
     "mosaia-tools-starter": "bin/dev.js"

@@ -1,22 +1,22 @@
 {
-    "name": "Slack Chat History Poster",
-    "description": "Fetches recent chat history from a Slack channel and posts it back to the channel",
+    "name": "Slack Task Extractor",
+    "description": "Fetches recent chat history from a Slack channel, extracts tasks and action items using Gemini AI, and provides a clean format for Google Sheets integration",
     "schema": {
         "type": "function",
         "function": {
-            "name": "Slack Chat History Poster",
-            "description": "Fetches recent chat history from a Slack channel and posts it back to the channel",
+            "name": "Slack Task Extractor",
+            "description": "Fetches recent chat history from a Slack channel, uses Gemini AI to extract tasks and action items, posts results to Slack, and returns clean task data for Google Sheets",
             "strict": true,
             "parameters": {
                 "type": "object",
                 "properties": {
                     "channel_id": {
                         "type": "string",
-                        "description": "The Slack channel ID to fetch messages from and post history back to"
+                        "description": "The Slack channel ID to fetch messages from and post task summary back to"
                     },
                     "user_id": {
                         "type": "string",
-                        "description": "The Slack user ID requesting the chat history"
+                        "description": "The Slack user ID requesting the task extraction"
                     },
                     "text": {
                         "type": "string",
@@ -33,7 +33,8 @@
         }
     },
     "envVars": [
-        "SLACK_BOT_TOKEN"
+        "SLACK_BOT_TOKEN",
+        "GEMINI_API_KEY"
     ],
     "server": {
         "startCommand": "npm run start:dev",
